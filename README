@@ -1,2 +1,62 @@
 Carolina Quiroz Restrepo
 NRC 000020380
+A continuación el paso a paso de lo realizado
+1. Carga y revisión inicial de los datos
+Primero cargué el archivo CSV en Google Colab usando pandas.
+Revisé las primeras y últimas filas para entender qué información traía y en qué formato, tambien lo valide y confirme en excel
+Me di cuenta de que el archivo usaba ; como separador de columnas y que las fechas no estaban en un formato uniforme, además que los números de los aportes tenían comas que podían generar problemas.
+
+2. Limpieza de nombres de columnas
+
+Cambié todos los nombres de columnas a minúsculas, quité espacios y reemplacé espacios por guiones bajos para que fueran fáciles de usar en el código,esto como recomendación de la IA
+
+
+3. Conversión de la columna de fechas
+
+unifique los formatos de las fechas
+
+Usé pd.to_datetime() con la opción dayfirst=True y errors="coerce" para que pandas entendiera que el día va antes del mes y que si algún valor era ilegible lo dejara como NaT (nulo).
+
+
+4. Conversión de los valores numéricos
+
+La columna aportes_w tenía comas como separadores de miles, se reemplazó por ;
+
+
+5. Identificación y manejo de duplicados
+
+Encontré duplicados exactos (misma fecha y mismo valor) y los eliminé directamente.
+
+También había duplicados temporales (misma fecha pero con valores diferentes).
+
+
+6. Revisión de valores atípicos (outliers)
+
+Detecté que había valores muy altos , pero al validar que no eran errores, sino mediciones reales de eventos extremos (por ejemplo, picos de aporte por lluvias intensas).
+
+
+7. Análisis temporal
+
+Agregué columnas para identificar el día, la semana y el mes de cada registro.
+
+Esto me permitió hacer agrupaciones y buscar patrones a lo largo del tiempo.
+
+También identifiqué la semana y el mes con mayores aportes.
+
+8. Estadísticas y patrones
+
+Calculé el aporte promedio diario y mensual.
+
+Encontré que en los meses lluviosos había más variabilidad y más picos extremos, mientras que en los meses secos
+
+
+9. Visualizaciones
+
+Hice histogramas para:
+
+Mostrar la distribución de valores de aportes (aportes_w).
+
+Mostrar la frecuencia de eventos de diferentes duraciones.
+
+Esto ayudó a ver de forma visual los patrones y la concentración de valores.
+
