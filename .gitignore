@@ -1,0 +1,144 @@
+# 1 LECTURA Y PROCESAMIENTO INICIAL
+import pandas as pd
+
+print("1. Lectura y procesamiento inicial")
+df = pd.read_csv('Aportes_Hidricos_Energia_Ituango_2024.csv', sep=';', encoding='utf-8')
+
+# Cargar datos con separador correcto
+df = pd.read_csv('Aportes_Hidricos_Energia_Ituango_2024.csv', sep=";", encoding="utf-8")
+
+# Normalizar nombres de columnas
+df.columns = df.columns.str.strip().str.lower().str.replace(" ", "_")
+
+# Conversión de fechas (formato mixto tolerante)
+df["fecha"] = pd.to_datetime(df["fecha"], errors="coerce", dayfirst=True)
+
+# Conversión de valores a numérico (quitando separadores de miles)
+df["aportes_w"] = df["aportes_w"].astype(str).str.replace(",", "", regex=False)
+df["aportes_w"] = pd.to_numeric(df["aportes_w"], errors="coerce")
+
+# Guardar registros iniciales
+registros_iniciales = len(df)
+
+# Eliminar duplicados exactos
+duplicados_exactos = df.duplicated().sum()
+df = df.drop_duplicates()
+
+# Eliminar duplicados temporales (misma fecha y valor)
+duplicados_temporales = df.duplicated(subset=["fecha"], keep=False).sum()
+if duplicados_temporales > 0:
+    df = df.groupby("fecha", as_index=False)["aportes_w"].mean()
+
+# Resultados esperados
+print("ETAPA 1 RESULTADOS")
+print(f"Total registros resultantes: {len(df)}")
+print(f"Duplicados exactos eliminados: {duplicados_exactos}")
+print(f"Duplicados temporales promediados: {duplicados_temporales}")
+print(f"Aporte mínimo: {df['aportes_w'].min():,.0f} W")
+print(f"Aporte máximo: {df['aportes_w'].max():,.0f} W")
+print(f"Aporte promedio: {df['aportes_w'].mean():,.0f} W")
+print(f"Aporte más frecuente (moda): {df['aportes_w'].mode()[0]:,.0f} W")
+
+# 1 LECTURA Y PROCESAMIENTO INICIAL
+import pandas as pd
+
+print("1. Lectura y procesamiento inicial")
+df = pd.read_csv('Aportes_Hidricos_Energia_Ituango_2024.csv', sep=';', encoding='utf-8')
+
+# Cargar datos con separador correcto
+df = pd.read_csv('Aportes_Hidricos_Energia_Ituango_2024.csv', sep=";", encoding="utf-8")
+
+# Normalizar nombres de columnas
+df.columns = df.columns.str.strip().str.lower().str.replace(" ", "_")
+
+# Conversión de fechas (formato mixto tolerante)
+df["fecha"] = pd.to_datetime(df["fecha"], errors="coerce", dayfirst=True)
+
+# Conversión de valores a numérico (quitando separadores de miles)
+df["aportes_w"] = df["aportes_w"].astype(str).str.replace(",", "", regex=False)
+df["aportes_w"] = pd.to_numeric(df["aportes_w"], errors="coerce")
+
+# Guardar registros iniciales
+registros_iniciales = len(df)
+
+# Eliminar duplicados exactos
+duplicados_exactos = df.duplicated().sum()
+df = df.drop_duplicates()
+
+# Eliminar duplicados temporales (misma fecha y valor)
+duplicados_temporales = df.duplicated(subset=["fecha"], keep=False).sum()
+if duplicados_temporales > 0:
+    df = df.groupby("fecha", as_index=False)["aportes_w"].mean()
+
+# Resultados esperados
+print("ETAPA 1 RESULTADOS")
+print(f"Total registros resultantes: {len(df)}")
+print(f"Duplicados exactos eliminados: {duplicados_exactos}")
+print(f"Duplicados temporales promediados: {duplicados_temporales}")
+print(f"Aporte mínimo: {df['aportes_w'].min():,.0f} W")
+print(f"Aporte máximo: {df['aportes_w'].max():,.0f} W")
+print(f"Aporte promedio: {df['aportes_w'].mean():,.0f} W")
+print(f"Aporte más frecuente (moda): {df['aportes_w'].mode()[0]:,.0f} W")
+
+
+# 3: COMPORTAMIENTO POR SEMANA Y POR MES
+
+df['semana'] = df['fecha'].dt.isocalendar().week
+df['mes'] = df['fecha'].dt.month
+df['mes_nombre'] = df['fecha'].dt.month_name()
+
+# Estadísticas por semana
+semana_stats = df.groupby('semana')['aportes_w'].agg(['min', 'mean', 'max']).reset_index()
+
+# Estadísticas por mes
+mes_stats = df.groupby('mes_nombre')['aportes_w'].agg(['min', 'mean', 'max']).reset_index()
+
+print("ETAPA 3 RESULTADOS - Semana")
+print(semana_stats)
+
+print("\nETAPA 3 RESULTADOS - Mes")
+print(mes_stats)
+
+
+# 4: VISUALIZACIONES
+
+
+# 1. Aporte promedio por semana
+plt.figure(figsize=(10,6))
+plt.plot(semana_stats['semana'], semana_stats['mean'], marker='o')
+plt.title('Aporte promedio semanal (W) - Hidroituango 2024')
+plt.xlabel('Semana')
+plt.ylabel('Aporte promedio (W)')
+plt.grid(True)
+plt.show()
+
+# 2. Outliers por mes
+outliers_mes = outliers.groupby('mes').size().reset_index(name='cantidad_outliers')
+plt.figure(figsize=(10,6))
+plt.bar(outliers_mes['mes'], outliers_mes['cantidad_outliers'], color='orange', edgecolor='black')
+plt.title('Cantidad de outliers por mes - Hidroituango 2024')
+plt.xlabel('Mes')
+plt.ylabel('Cantidad de outliers')
+plt.grid(axis='y')
+plt.show()
+
+5: Preguntas de interpretación de códigos y resultados.
+
+¿Qué patrones temporales identificaste en los aportes energéticos? En los meses de abril y octubre se presentaron mas lluvias y los meses entre enero y julio la temporada fue mas seca
+
+¿Qué puedes decir de la tendencia de comportamiento de los outliers para cada mes? Los meses mas lluviosos como abril y octubre presentaron outliers más altos y más frecuentes.
+
+Los meses mas secos como de enero a julio los outliers fueron más escasos y menos extremos
+
+¿Cuáles fueron los principales desafíos de calidad de datos y cómo los resolviste? Diferentes formatos de fechas y esto nos impedia ordenar y agrupar los datos, por lo cual tuve que estandarizarlos con pd.to_datetime(..., errors='coerce', dayfirst=True)
+
+Habían varios duplicados exactos, uno con con fechas y valores, tambien se confirmó en excel los valores exactos y se eliminaron para posterior usar el promedio por timestamp.
+
+Habían valores con picos muy altos, pero eran datos que podían demostrar errores en la medición y se debían conservar El separador decimal usaban comas(,) se reemplazó para pasar los datos a float
+
+¿Qué recomendaciones harías para mejorar la recolección de datos futura? Evitar duplicados en el archivo de los datos Unificar los formatos de fechas
+
+¿Cómo podrían estos análisis ayudar en la planificación energética? Anticiparnos a los meses que son mas secos para hacer contingencias a nivel uso de energía, tambien nos ayuda a saber generalmente los meses de mas lluvia y así poder tomar medidas en los enbalses o en zanas de riesgo. Otra cosa tambien importante que los meses donde los datos son mas constantes y no dan tanto valor pdrogramar mantenimiento de los equipos de medición. Con esta información podemos crear modelos de predicción automaticos que nos van a ayudar en el analisis de la información en tiempo real
+
+Haz doble clic (o pulsa Intro) para editar
+
